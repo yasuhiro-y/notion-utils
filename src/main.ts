@@ -1,5 +1,6 @@
-const main = () => {
-  console.log('It works!');
-};
+import { notion } from './api/api';
 
-main();
+(async () => {
+  const listUsersResponse = await notion.users.list({});
+  console.log(listUsersResponse);
+})();
