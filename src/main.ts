@@ -1,4 +1,4 @@
-import { notion } from './api/api';
+import { notion } from './api/notion';
 
 (async () => {
   const listUsersResponse = await notion.users.list({});
