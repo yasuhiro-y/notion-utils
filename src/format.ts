@@ -14,7 +14,26 @@ export const formatDateAndTitle = (str: string): DateTitle => {
   if (str.match(/^[0-9]{8}/)) {
     rawDateString = String(str.match(/^[0-9]{8}/));
     dateString = dayjs(rawDateString).format('YYYYMMDD');
+    return {
+      date: dayjs(rawDateString).format('YYYY/MM/DD'),
+      title: generateTitle(str, rawDateString, dateString),
+    };
+  }
 
+  // YYYY/MM/DD
+  if (str.match(/^[0-9]{2,4}[\/|-|.][0-9]{1,2}[\/|-|.][0-9]{1,2}/)) {
+    rawDateString = String(str.match(/^[0-9]{2,4}[\/|-|.][0-9]{1,2}[\/|-|.][0-9]{1,2}/));
+    dateString = dayjs(rawDateString).format('YYYYMMDD');
+    return {
+      date: dayjs(rawDateString).format('YYYY/MM/DD'),
+      title: generateTitle(str, rawDateString, dateString),
+    };
+  }
+
+  // MM-DD
+  if (str.match(/^[0-9]{1,2}[\/|-|.][0-9]{1,2}/)) {
+    rawDateString = '20' + String(str.match(/^[0-9]{1,2}-[0-9]{1,2}/));
+    dateString = dayjs(rawDateString).format('YYYYMMDD');
     return {
       date: dayjs(rawDateString).format('YYYY/MM/DD'),
       title: generateTitle(str, rawDateString, dateString),
@@ -38,24 +57,7 @@ export const formatDateAndTitle = (str: string): DateTitle => {
       title: generateTitle(str, rawDateString, dateString),
     };
   }
-  // YYYY-MM-DD
-  if (str.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}/)) {
-    rawDateString = String(str.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}/));
-    dateString = dayjs(rawDateString).format('YYYYMMDD');
-    return {
-      date: dayjs(rawDateString).format('YYYY/MM/DD'),
-      title: generateTitle(str, rawDateString, dateString),
-    };
-  }
-  // YY-MM-DD
-  if (str.match(/^[0-9]{2}-[0-9]{2}-[0-9]{2}/)) {
-    rawDateString = '20' + String(str.match(/^[0-9]{2}-[0-9]{2}-[0-9]{2}/));
-    dateString = dayjs(rawDateString).format('YYYYMMDD');
-    return {
-      date: dayjs(rawDateString).format('YYYY/MM/DD'),
-      title: generateTitle(str, rawDateString, dateString),
-    };
-  }
+
   return { date: undefined, title: str };
 };
 
@@ -72,7 +74,6 @@ const convertToTab = (title?: string, date?: string) => {
 const convertText = async () => {
   await fs.readFile(filePathFrom, 'utf8', async (err, data) => {
     const lines = await data.toString().split('\n');
-    console.log(lines);
 
     fs.truncate(filePathDist, 0, () => {});
     let newLines = '';
@@ -80,8 +81,7 @@ const convertText = async () => {
       const line = await lines[idx];
 
       const { title, date } = await formatDateAndTitle(line);
-      await console.log(title);
-      await console.log(date);
+
       const newLine = await convertToTab(title, date);
 
       newLines = (await newLines) + newLine + '\n';
@@ -89,7 +89,6 @@ const convertText = async () => {
 
     await fs.appendFile(filePathDist, newLines + '\n', (err) => {
       if (err) throw err;
-      // console.log('test.txtに追記されました');
     });
   });
 };
